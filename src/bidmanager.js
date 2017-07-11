@@ -98,6 +98,17 @@ exports.addBidResponse = function (adUnitCode, bid) {
       return;
     }
 
+    // 'banner' is default and may not be explicitly set on mediaType, so any other mediaType isn't checked
+    if (!['video', 'video-outstream', 'native'].includes(bid.mediaType)) {
+      if (bid.width === undefined || bid.height === undefined) {
+        const adUnit = getBidderRequest(bid.bidderCode, adUnitCode);
+        const sizes = adUnit && adUnit.bids && adUnit.bids[0] && adUnit.bids[0].sizes;
+        // TODO: set width and height if one valid size
+        utils.logError(`banner bids require a width and height. ${bid.bidderCode} bid id ${bid.adId} won't be added to the auction`);
+        return;
+      }
+    }
+
     const { requestId, start } = getBidderRequest(bid.bidderCode, adUnitCode);
     Object.assign(bid, {
       requestId: requestId,
