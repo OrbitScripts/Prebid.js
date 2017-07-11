@@ -455,7 +455,7 @@ exports.insertElement = function(elm, doc, target) {
 
 exports.insertPixel = function (url) {
   const img = new Image();
-  img.id = this.getUniqueIdentifierStr();
+  img.id = _getUniqueIdentifierStr();
   img.src = url;
   img.height = 0;
   img.width = 0;
@@ -466,7 +466,7 @@ exports.insertPixel = function (url) {
     } catch (e) {
     }
   };
-  this.insertElement(img);
+  exports.insertElement(img);
 };
 
 /**
