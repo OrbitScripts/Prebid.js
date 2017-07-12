@@ -8,10 +8,26 @@ let bidmanager = require('src/bidmanager');
 let bidfactory = require('src/bidfactory');
 let Adapter = require('src/adapter');
 
-// Bid request endpoint
-let jptCallEndPoint = '//indra.orbitsoft:1080/ads/show/hb?';
-
-// $$PREBID_GLOBAL$$.logging = true;
+let styleParamsToFieldsMap = {
+  'title.family': 'f1', // headerFont
+  'title.size': 'fs1', // headerFontSize
+  'title.weight': 'w1', // headerWeight
+  'title.style': 's1', // headerStyle
+  'title.color': 'c3', // headerColor
+  'description.family': 'f2', // descriptionFont
+  'description.size': 'fs2', // descriptionFontSize
+  'description.weight': 'w2', // descriptionWeight
+  'description.style': 's2', // descriptionStyle
+  'description.color': 'c4', // descriptionColor
+  'url.family': 'f3', // urlFont
+  'url.size': 'fs3', // urlFontSize
+  'url.weight': 'w3', // urlWeight
+  'url.style': 's3', // urlStyle
+  'url.color': 'c5', // urlColor
+  'colors.background': 'c2', // borderColor
+  'colors.border': 'c1', // borderColor
+  'colors.link': 'c6', // lnkColor
+};
 
 let OrbitsoftAdapter;
 OrbitsoftAdapter = function OrbitsoftAdapter() {
@@ -37,7 +53,17 @@ OrbitsoftAdapter = function OrbitsoftAdapter() {
 
     let referrer = utils.getBidIdParameter('ref', bid.params);
     let location = utils.getBidIdParameter('loc', bid.params);
-    let jptCall = jptCallEndPoint;
+    let jptCall = utils.getBidIdParameter('requestUrl', bid.params);
+    if (jptCall.length === 0) {
+      // No param requestUrl
+      // @if NODE_ENV='debug'
+      utils.logMessage('No param requestUrl');
+      // @endif
+      return null;
+    }
+    else {
+      jptCall += '?';
+    }
 
     jptCall = utils.tryAppendQueryString(jptCall, 'callback', '$$PREBID_GLOBAL$$.handleOASCB');
     jptCall = utils.tryAppendQueryString(jptCall, 'callback_uid', callbackId);
@@ -140,7 +166,10 @@ OrbitsoftAdapter = function OrbitsoftAdapter() {
             let currentStyle = styles[currentValue];
             for (let field in currentStyle) {
               if (currentStyle.hasOwnProperty(field)) {
-                stylesParams[currentValue + '.' + field] = currentStyle[field];
+                let styleField = styleParamsToFieldsMap[currentValue + '.' + field];
+                if (styleField !== undefined) {
+                  stylesParams[styleField] = currentStyle[field];
+                }
               }
             }
           }
@@ -152,7 +181,7 @@ OrbitsoftAdapter = function OrbitsoftAdapter() {
         let customParamsArray = {};
         for (let customField in customParams) {
           if (customParams.hasOwnProperty(customField)) {
-            customParamsArray['customParams.' + customField] = customParams[customField];
+            customParamsArray['c.' + customField] = customParams[customField];
           }
         }
         let customParamsLink = utils.parseQueryStringParameters(customParamsArray);

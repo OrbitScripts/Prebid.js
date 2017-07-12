@@ -5,6 +5,7 @@ describe('Orbitsoft Adapter tests', function () {
   const bidmanager = require('src/bidmanager');
   const adloader = require('src/adloader');
   const CONSTANTS = require('src/constants.json');
+
   const contentCallEndPoint = 'http://orbitsoft.com/ads/show/content?';
   const jptCallEndPoint = 'http://orbitsoft.com/ads/show/hb?';
 
@@ -26,7 +27,8 @@ describe('Orbitsoft Adapter tests', function () {
             bidId: 'bidIdOrbitsoft1',
             bidder: 'orbitsoft',
             params: {
-              placementId: '16'
+              placementId: '16',
+              requestUrl: jptCallEndPoint
             },
             sizes: [[300, 250]],
             placementCode: 'test-div-12345'
@@ -64,7 +66,8 @@ describe('Orbitsoft Adapter tests', function () {
             bidId: 'bidIdOrbitsoft1',
             bidder: 'orbitsoft',
             params: {
-              placementId: '16'
+              placementId: '16',
+              requestUrl: jptCallEndPoint
             },
             sizes: [[300, 250]],
             placementCode: 'test-div-12345'
@@ -98,7 +101,8 @@ describe('Orbitsoft Adapter tests', function () {
           bidId: 'bidIdOrbitsoft1',
           bidder: 'orbitsoft',
           params: {
-            placementId: '16'
+            placementId: '16',
+            requestUrl: jptCallEndPoint
           },
           sizes: [[300, 250]],
           placementCode: 'test-div-12345'
@@ -144,7 +148,8 @@ describe('Orbitsoft Adapter tests', function () {
         {
           sizes: [[300, 250], [300, 600]],
           params: {
-            placementId: '16'
+            placementId: '16',
+            requestUrl: jptCallEndPoint
           }
         }
       ]
@@ -154,6 +159,7 @@ describe('Orbitsoft Adapter tests', function () {
     sinon.assert.calledOnce(spyLoadScript);
 
     let bidUrl = spyLoadScript.getCall(0).args[0];
+    expect(bidUrl).to.include(jptCallEndPoint);
     expect(bidUrl).to.include('scid=16');
     expect(bidUrl).to.include('size=300x250');
     expect(bidUrl).to.include('loc');
@@ -164,6 +170,22 @@ describe('Orbitsoft Adapter tests', function () {
     it('should not call loadscript when inputting with empty params', function () {
       let spyLoadScript = sinon.spy(adloader, 'loadScript');
       adapter().callBids({});
+      assert(!spyLoadScript.called);
+      spyLoadScript.restore();
+    });
+
+    it('should not call loadscript when inputting without requestUrl param ', function () {
+      let spyLoadScript = sinon.spy(adloader, 'loadScript');
+      let params = {
+        bids: [
+          {
+            params: {
+              placementId: '16'
+            }
+          }
+        ]
+      };
+      adapter().callBids(params);
       assert(!spyLoadScript.called);
       spyLoadScript.restore();
     });
@@ -181,7 +203,8 @@ describe('Orbitsoft Adapter tests', function () {
         bids: [
           {
             params: {
-              placementId: '16'
+              placementId: '16',
+              requestUrl: jptCallEndPoint
             }
           }
         ]
@@ -191,6 +214,7 @@ describe('Orbitsoft Adapter tests', function () {
       sinon.assert.calledOnce(spyLoadScript);
 
       let bidUrl = spyLoadScript.getCall(0).args[0];
+      expect(bidUrl).to.include(jptCallEndPoint);
       expect(bidUrl).to.include('scid=16');
       expect(bidUrl).to.not.include('size=');
       expect(bidUrl).to.include('loc');
@@ -208,6 +232,7 @@ describe('Orbitsoft Adapter tests', function () {
             bidder: 'orbitsoft',
             params: {
               placementId: '16',
+              requestUrl: jptCallEndPoint,
               style: {
                 title: {
                   family: 'Tahoma',
@@ -262,25 +287,24 @@ describe('Orbitsoft Adapter tests', function () {
       let adUrl = bidResponse1.adUrl;
       let content_url = contentCallEndPoint + 'id=1_201707031440_56069e8e70318303e5869fad86722cb0';
       expect(adUrl).to.include(content_url);
-      expect(adUrl).to.include('title.family=Tahoma');
-      expect(adUrl).to.include('title.family=Tahoma');
-      expect(adUrl).to.include('title.size=medium');
-      expect(adUrl).to.include('title.weight=normal');
-      expect(adUrl).to.include('title.style=normal');
-      expect(adUrl).to.include('title.color=0053F9');
-      expect(adUrl).to.include('description.family=Tahoma');
-      expect(adUrl).to.include('description.size=medium');
-      expect(adUrl).to.include('description.weight=normal');
-      expect(adUrl).to.include('description.style=normal');
-      expect(adUrl).to.include('description.color=0053F9');
-      expect(adUrl).to.include('url.family=Tahoma');
-      expect(adUrl).to.include('url.size=medium');
-      expect(adUrl).to.include('url.weight=normal');
-      expect(adUrl).to.include('url.style=normal');
-      expect(adUrl).to.include('url.color=0053F9');
-      expect(adUrl).to.include('colors.background=ffffff');
-      expect(adUrl).to.include('colors.border=E0E0E0');
-      expect(adUrl).to.include('colors.link=5B99FE');
+      expect(adUrl).to.include('f1=Tahoma');
+      expect(adUrl).to.include('fs1=medium');
+      expect(adUrl).to.include('w1=normal');
+      expect(adUrl).to.include('s1=normal');
+      expect(adUrl).to.include('c3=0053F9');
+      expect(adUrl).to.include('f2=Tahoma');
+      expect(adUrl).to.include('fs2=medium');
+      expect(adUrl).to.include('w2=normal');
+      expect(adUrl).to.include('s2=normal');
+      expect(adUrl).to.include('c4=0053F9');
+      expect(adUrl).to.include('f3=Tahoma');
+      expect(adUrl).to.include('fs3=medium');
+      expect(adUrl).to.include('w3=normal');
+      expect(adUrl).to.include('s3=normal');
+      expect(adUrl).to.include('c5=0053F9');
+      expect(adUrl).to.include('c2=ffffff');
+      expect(adUrl).to.include('c1=E0E0E0');
+      expect(adUrl).to.include('c6=5B99FE');
 
       stubAddBidResponse.restore();
     });
@@ -296,6 +320,7 @@ describe('Orbitsoft Adapter tests', function () {
             bidder: 'orbitsoft',
             params: {
               placementId: '16',
+              requestUrl: jptCallEndPoint,
               customParams: {
                 macro_name: 'macro_value'
               }
@@ -325,7 +350,7 @@ describe('Orbitsoft Adapter tests', function () {
       let adUrl = bidResponse1.adUrl;
       let content_url = contentCallEndPoint + 'id=1_201707031440_56069e8e70318303e5869fad86722cb0';
       expect(adUrl).to.include(content_url);
-      expect(adUrl).to.include('customParams.macro_name=macro_value');
+      expect(adUrl).to.include('c.macro_name=macro_value');
 
       stubAddBidResponse.restore();
     });
