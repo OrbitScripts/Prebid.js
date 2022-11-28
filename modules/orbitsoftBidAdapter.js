@@ -40,7 +40,7 @@ export const spec = {
     }
     return true;
   },
-  buildRequests: function (validBidRequests) {
+  buildRequests: function (validBidRequests, bidderRequest) {
     let bidRequest;
     let serverRequests = [];
     for (let i = 0; i < validBidRequests.length; i++) {
@@ -55,8 +55,8 @@ export const spec = {
       if (location === '') {
         location = utils.getWindowLocation();
       }
-      if (referrer === '' && bidRequest && bidRequest.refererInfo) {
-        referrer = bidRequest.refererInfo.referer;
+      if (referrer === '' && bidderRequest && bidderRequest.refererInfo) {
+        referrer = bidderRequest.refererInfo.referer;
       }
 
       // Styles params
